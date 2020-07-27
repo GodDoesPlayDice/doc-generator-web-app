@@ -18,6 +18,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import { Interface } from 'readline';
 
 const tableIcons: any = {
 	Add: forwardRef((props: any, ref: any) => <AddBox {...props} ref={ref} />),
@@ -42,93 +43,122 @@ const tableIcons: any = {
 
 
 
-interface TableModifier {
-	liftStateUpFunc: (data: any) => any,
+interface TableProps {
+	liftStateUpFunc: (data: any) => any;
+	columns: any;
+	tableTitle: string;
+	currentData: any;
+
 }
 
-export default function Table(props: TableModifier) {
+export default function Table(props: TableProps) {
 
-	interface Row {
+	// интерфейс у нас будет динамическим, так что пока это уберем
+	/* interface Row {
 		name: string;
 		surname: string;
 		birthYear: number;
 		birthCity: number;
-	}
+	} */
 
 	interface TableState {
-		columns: Array<Column<Row>>;
-		data: Row[];
+		columns: Array<Column<any>>;
+		data: any[];
 	}
 
+	// поднимаем состояние до родителя здесь
 	useEffect(() => {
-		// поднимаем состояние до родителя здесь
-		props.liftStateUpFunc(state);
+		if (props.currentData === false) {
+			setState({
+				columns: props.columns,
+				data: [],
+			})
+		};
+		props.liftStateUpFunc(state.data);
 	});
 
 	const [state, setState] = React.useState<TableState>({
-		columns: [
-			{ title: 'Name', field: 'name' },
-			{ title: 'Surname', field: 'surname' },
-			{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
-			{
-				title: 'Birth Place',
-				field: 'birthCity',
-				lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-			},
-		],
-		data: [
-			{ name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-			{
-				name: 'Zerya Betül',
-				surname: 'Baran',
-				birthYear: 2017,
-				birthCity: 63,
-			},
-		],
+		columns: props.columns,
+		data: [],
 	});
+
+	const editableObj = {
+		onRowAdd: (newData: any) =>
+			new Promise((resolve) => {
+				setTimeout(() => {
+					resolve();
+					setState((prevState) => {
+						const data = [...prevState.data];
+						data.push(newData);
+						return { ...prevState, data };
+					});
+				}, 600);
+			}),
+		onRowUpdate: (newData: any, oldData: any) =>
+			new Promise((resolve) => {
+				setTimeout(() => {
+					resolve();
+					if (oldData) {
+						setState((prevState) => {
+							const data = [...prevState.data];
+							data[data.indexOf(oldData)] = newData;
+							return { ...prevState, data };
+						});
+					}
+				}, 600);
+			}),
+		onRowDelete: (oldData: any) =>
+			new Promise((resolve) => {
+				setTimeout(() => {
+					resolve();
+					setState((prevState) => {
+						const data = [...prevState.data];
+						data.splice(data.indexOf(oldData), 1);
+						return { ...prevState, data };
+					});
+				}, 600);
+			}),
+	};
 
 	return (
 		<MaterialTable
 			icons={tableIcons}
-			title="Editable Example"
-			columns={state.columns}
-			data={state.data}
-			editable={{
-				onRowAdd: (newData) =>
-					new Promise((resolve) => {
-						setTimeout(() => {
-							resolve();
-							setState((prevState) => {
-								const data = [...prevState.data];
-								data.push(newData);
-								return { ...prevState, data };
-							});
-						}, 600);
-					}),
-				onRowUpdate: (newData, oldData) =>
-					new Promise((resolve) => {
-						setTimeout(() => {
-							resolve();
-							if (oldData) {
-								setState((prevState) => {
-									const data = [...prevState.data];
-									data[data.indexOf(oldData)] = newData;
-									return { ...prevState, data };
-								});
-							}
-						}, 600);
-					}),
-				onRowDelete: (oldData) =>
-					new Promise((resolve) => {
-						setTimeout(() => {
-							resolve();
-							setState((prevState) => {
-								const data = [...prevState.data];
-								data.splice(data.indexOf(oldData), 1);
-								return { ...prevState, data };
-							});
-						}, 600);
-					}),
+			title={props.tableTitle}
+			columns={props.columns}
+			data={props.currentData}
+			editable={editableObj}
+			/* options={{
+				fixedColumns: {
+					left: 1
+				  }
+			}} */
+			localization={{
+				header: {
+					actions: 'Действия'
+				},
+				body: {
+					emptyDataSourceMessage: 'Тут пока ни одной записи...',
+					addTooltip: 'Добавить документ',
+					deleteTooltip: 'Удалить документ',
+					editTooltip: 'Редактировать документ',
+					editRow: {
+						cancelTooltip: 'Отменить',
+						saveTooltip: 'Сохранить'
+					}
+				},
+				toolbar: {
+					searchTooltip: 'Поиск',
+					searchPlaceholder: 'Найти документ'
+
+				},
+				pagination: {
+					labelRowsSelect: 'строк',
+					labelDisplayedRows: '{count} из {from}-{to}',
+					firstTooltip: 'Первая страница',
+					previousTooltip: 'Предыдущая страница',
+					nextTooltip: 'Следующая страница',
+					lastTooltip: 'Последния страница'
+				}
 			}}
 		/>
 	);
