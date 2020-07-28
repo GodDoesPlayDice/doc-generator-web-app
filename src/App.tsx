@@ -2,9 +2,14 @@ import React, { useEffect } from 'react';
 import Table from './components/table'
 import SimpleSelect from './components/select'
 import SimpleButton from './components/button';
-
-
-
+import {
+  basicNoticeFiels,
+  noticeWithDebtOrPaymentFields,
+  basicActFields,
+  basicV2O2Fields,
+  basicBFields,
+  actWithDebtFields
+} from './tableTemplate';
 
 export default function App() {
 
@@ -15,117 +20,32 @@ export default function App() {
   // данные из таблицы
   let [tableRowsData, updateTableRowsData] = React.useState<any>([]);
 
-
   // используем эффект для изменения полей таблицы
   useEffect(() => {
-    let dynamicColumnsTemplate: any;
-    if (options["select-development-project"] === 'V2') {
-      dynamicColumnsTemplate = [
-        {
-          title: 'ФИО клиента',
-          field: 'clientName',
-          /* cellStyle: {width: 200} */
-        },
-        {
-          title: 'Дата рождения',
-          field: 'birthDate'
-        },
-        {
-          title: 'Пол клиента',
-          field: 'sex'
-        },
-        {
-          title: 'Место рождения',
-          field: 'birthPlace'
-        },
-        {
-          title: 'Серия и/или номер паспорта',
-          field: 'passportNumber'
-        },
-        {
-          title: 'Кем выдан паспорт',
-          field: 'passportIssuedBy'
-        },
-        {
-          title: 'Дата выдачи паспорта',
-          field: 'passportIssueDate'
-        },
-        {
-          title: 'Код подразделения',
-          field: 'passportOfficeCode'
-        },
-        {
-          title: 'Адрес регистрации клинета',
-          field: 'clientAddress'
-        },
-        {
-          title: 'Номер телефона клиента',
-          field: 'clientPhone'
-        }, // только для баланса
-        {
-          title: 'Адрес регистрации клинета',
-          field: 'clientAddress'
-        },
-        {
-          title: 'Вариант принятия в собственность объекта',
-          field: 'wayOfTakingOwnership'
-        },
-        {
-          title: 'Номер корпуса',
-          field: 'literNumber', type: 'numeric'
-        },
-        {
-          title: 'Номер квартиры',
-          field: 'flatNumber', type: 'numeric'
-        },
-        {
-          title: 'Этаж',
-          field: 'floorNumber', type: 'numeric'
-        },
-        {
-          title: 'Количество комнат',
-          field: 'roomsNumber', type: 'numeric'
-        }, // здесь возможно потребуются изменения для студий
-        {
-          title: 'Площадь (без лет. пом.) по договору',
-          field: 'flatAreaUnderContract', type: 'numeric'
-        },
-        {
-          title: 'Площадь (без лет. пом.) по инвентаризации',
-          field: 'flatAreaUnderInventory', type: 'numeric'
-        },
-        {
-          title: 'Площадь (с пониж. коэфф.) по договору',
-          field: 'flatAreaWithBalconiesUnderContract', type: 'numeric'
-        },
-        {
-          title: 'Площадь (с пониж. коэфф.) по инвентаризации',
-          field: 'flatAreaWithBalconiesUnderInventory', type: 'numeric'
-        },
-        {
-          title: 'Номер договора',
-          field: 'docNumber'
-        },
-        {
-          title: 'Дата заключения договора',
-          field: 'docDate'
-        },
-        {
-          title: 'Дата заключения договора',
-          field: 'docDate'
-        },
-        {
-          title: 'Сумма задолженности в рублях',
-          field: 'customerDebtByNumber'
-        },
-        {
-          title: 'Сумма задолженности текстом',
-          field: 'customerDebtByText'
-        },
-      ]
-    }
-
-    updateColumns(dynamicColumnsTemplate);
+    let finalTemplate: any = [];
+    // поля для уведомления
+    if (options["select-doc-type"] === 'notice') {
+      finalTemplate = finalTemplate.concat(basicNoticeFiels);
+      // проверка подтипа документа 
+      if (options["select-doc-subtype"] === 'noticeWithDebt' || options["select-doc-subtype"] === 'noticeWithPayment') {
+        finalTemplate = finalTemplate.concat(noticeWithDebtOrPaymentFields);
+      }
+    };
+    // поля для акта приема-передачи
+    if (options["select-doc-type"] === 'act') {
+      finalTemplate = finalTemplate.concat(basicActFields)
+      // выбор полей для объекта 
+      if (options["select-development-project"] === 'B') {
+        finalTemplate = finalTemplate.concat(basicBFields)
+      } else {
+        finalTemplate = finalTemplate.concat(basicV2O2Fields)
+      }
+      // выбор полей для подтипа документа
+      if (options["select-doc-subtype"] === 'withDebt') {
+        finalTemplate = finalTemplate.concat(actWithDebtFields)
+      }
+    };
+    updateColumns(finalTemplate);
   }, [options]);
 
   function onTableChange(data: any) {
@@ -213,7 +133,7 @@ export default function App() {
         currentData={tableRowsData}
       />
       <SimpleButton
-        label="Создать документы" 
+        label="Создать документы"
         onClick={generateBtnClicked}
       />
     </>
