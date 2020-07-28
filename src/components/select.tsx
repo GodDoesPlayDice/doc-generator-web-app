@@ -54,9 +54,12 @@ export default function SimpleSelect(props: SelectProps) {
                     value={value}
                     onChange={handleChange}
                 >
-                {
-                    makeMenuItems()
-                }
+                    <MenuItem value="">
+                        <em>Не выбрано</em>
+                    </MenuItem>
+                    {
+                        makeMenuItems()
+                    }
                 </Select>
             </FormControl>
         </div>

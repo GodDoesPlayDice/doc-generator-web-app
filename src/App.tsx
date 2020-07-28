@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Table from './components/table'
 import SimpleSelect from './components/select'
+import SimpleButton from './components/button';
 
 
 
@@ -14,30 +15,12 @@ export default function App() {
   // данные из таблицы
   let [tableRowsData, updateTableRowsData] = React.useState<any>([]);
 
+
+  // используем эффект для изменения полей таблицы
   useEffect(() => {
-    
-  }, [options]);
-
-  function onTableChange(data: any) {
-    updateTableRowsData(data);
-  }
-
-  function onSelectChange(value: string, id: string) {
-
-    //записываем в глобальный state выбранные опции в селектах
-    updateOptions((prevState: any) => {
-      prevState[id] = value;
-      return { ...prevState };
-    });
-
-    console.log(options);
-    // при изменении любого селекта должны удаляться все данные таблицы
-    updateTableRowsData(false);
-    //
-
-    let columns;
-    if (value === 'V2') {
-      columns = [
+    let dynamicColumnsTemplate: any;
+    if (options["select-development-project"] === 'V2') {
+      dynamicColumnsTemplate = [
         {
           title: 'ФИО клиента',
           field: 'clientName',
@@ -142,7 +125,27 @@ export default function App() {
       ]
     }
 
-    updateColumns(columns);
+    updateColumns(dynamicColumnsTemplate);
+  }, [options]);
+
+  function onTableChange(data: any) {
+    updateTableRowsData(data);
+  }
+
+  function onSelectChange(value: string, id: string) {
+
+    //записываем в глобальный state выбранные опции в селектах
+    updateOptions((prevState: any) => {
+      prevState[id] = value;
+      return { ...prevState };
+    });
+    // при изменении любого селекта должны удаляться все данные таблицы
+    updateTableRowsData(false);
+    //
+  }
+
+  function generateBtnClicked() {
+    console.log(options, tableRowsData);
   }
 
   const docSubtypeSelectItems = () => {
@@ -163,13 +166,13 @@ export default function App() {
   }
 
   const createTableTitle = () => {
+    if (options == {}) return "Таблица документов";
     let result: string = "";
     for (let key in options) {
       result = result + " " + (options[key] as string);
     }
     return result;
   }
-
   return (
     <>
       <SimpleSelect
@@ -208,6 +211,10 @@ export default function App() {
         liftStateUpFunc={onTableChange}
         columns={columns}
         currentData={tableRowsData}
+      />
+      <SimpleButton
+        label="Создать документы" 
+        onClick={generateBtnClicked}
       />
     </>
 
