@@ -1,9 +1,20 @@
 import React, { useEffect } from 'react';
 import Table from './components/table'
 import Button from '@material-ui/core/Button';
+
+// мои компоненты
 import SimpleSelect from './components/select'
 import SimpleButton from './components/button';
 import SimpleBackdrop from './components/backdrop'
+import AlertDialog from './components/dialog';
+
+// для модального окна
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+// мои шаблоны для полей таблицы
 import {
   basicNoticeFiels,
   noticeWithDebtOrPaymentFields,
@@ -13,14 +24,21 @@ import {
   actWithDebtFields
 } from './tableTemplate';
 
+// описываем имена опции для селектов и тип хранимых значений
 interface selectedOptionsObj {
   "select-development-project": string;
   "select-doc-subtype": string;
   "select-doc-type": string;
 }
 
-// интерфейс для опции модального окна или backdrop
+// интерфейс для опций backdrop
 interface backdropOptions {
+  isOpen: boolean;
+  message?: string;
+}
+
+// интерфейс для опций модального окна
+interface modalOptions {
   isOpen: boolean;
   message?: string;
 }
@@ -39,8 +57,12 @@ export default function App() {
   let [columns, updateColumns] = React.useState<any>([]);
   // данные из таблицы
   let [tableRowsData, updateTableRowsData] = React.useState<any>([]);
+  // для backdrop
+  let [backdropOptions, updateBackdropOptions] = React.useState<backdropOptions>({
+    isOpen: false
+  });
   // для модального окна
-  let [modalOptions, updateModalOptions] = React.useState<backdropOptions>({
+  let [modalOptions, updateModalOptions] = React.useState<modalOptions>({
     isOpen: false
   });
 
@@ -74,10 +96,12 @@ export default function App() {
 
   }, [options]);
 
+  // обновляем тут данные, записанные в таблицу
   function onTableChange(data: any) {
     updateTableRowsData(data);
   }
 
+  // обновляем тут стейт для селектами опций
   function onSelectChange(value: string, id: string) {
     // при изменении любого селекта должны удаляться все данные таблицы
     updateTableRowsData(false);
@@ -89,10 +113,12 @@ export default function App() {
 
   }
 
+
   function generateBtnClicked() {
     console.log(options, tableRowsData);
   }
 
+  // определение состава опций селекта выбора подтипа документов
   const docSubtypeSelectItems = () => {
     if (options["select-doc-type"] === 'notice') {
       return (
@@ -110,6 +136,7 @@ export default function App() {
     }
   }
 
+  // функция, которая собирает строку заголовка таблицы
   const createTableTitle = () => {
     if (options == {}) return "Таблица документов";
     let result: string = "";
@@ -118,6 +145,8 @@ export default function App() {
     }
     return result;
   }
+
+
   return (
     <>
       <SimpleSelect
@@ -169,22 +198,63 @@ export default function App() {
       {options['select-development-project'] &&
         <SimpleButton
           label="Создать документы"
-          onClick={generateBtnClicked}
+          onClick={function () {
+            updateBackdropOptions({ isOpen: true });
+            generateBtnClicked()
+          }}
         />
       }
-      <Button variant="outlined" color="primary" onClick={function () {
-              updateModalOptions({ isOpen: true })
-            }}>
+      {/* <Button variant="outlined" color="primary" onClick={function () {
+        updateBackdropOptions({ isOpen: true })
+      }}>
         Show backdrop
+      </Button> */}
+      <Button variant="outlined" color="primary" onClick={
+        function () {
+          updateModalOptions({ isOpen: true })
+        }}>
+        Open alert dialog
       </Button>
-      <SimpleBackdrop
+
+      {/* модальное окно */}
+      <AlertDialog
         isOpen={modalOptions.isOpen}
         children={
+          <>
+            <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Let Google help apps determine location. This means sending anonymous location data to
+                Google, even when no apps are running.
+          </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={function () {
+                updateModalOptions({ isOpen: false })
+              }} color="primary">
+                Отмена
+          </Button>
+              <Button onClick={function () {
+                // закрывает модальное окно
+                updateModalOptions({ isOpen: false })
+                // открывает backdrop
+                updateBackdropOptions({ isOpen: true })
+              }} color="primary" autoFocus>
+                Сохранить документы
+          </Button>
+            </DialogActions>
+          </>
+        }
+      />
+      {/* крутилочка */}
+      <SimpleBackdrop
+        isOpen={backdropOptions.isOpen}
+        children={
           <SimpleButton
-            label="Создать документы"
+            label="АТМЕНА!!!"
             onClick={function () {
-              console.log(modalOptions)
-              updateModalOptions({ isOpen: false })
+              console.log(backdropOptions)
+              updateBackdropOptions({ isOpen: false })
             }}
           />
         }
