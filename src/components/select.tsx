@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface SelectProps {
-    liftStateUpFunc: (data: string, id: string) => void,
+    liftStateUpFunc: (data: any, id: string) => void,
     menuItems: any,
     selectID: string,
     labelID: string,
@@ -35,6 +35,13 @@ export default function SimpleSelect(props: SelectProps) {
         // поднимаем состояние родительскому компоненту
         props.liftStateUpFunc(event.target.value as string, props.selectID);
     };
+
+    // сброс данных каждого селекта при размонтировании
+    useEffect(() => {
+        return function cleanup() {
+            props.liftStateUpFunc(null, props.selectID);
+        };
+    }, []); // если не передавать пустой массив, то виснет приложение
 
     function makeMenuItems() {
         let result = [];
@@ -54,9 +61,9 @@ export default function SimpleSelect(props: SelectProps) {
                     value={value}
                     onChange={handleChange}
                 >
-                    {/* <MenuItem value="">
+                    <MenuItem value="">
                         <em>Не выбрано</em>
-                    </MenuItem> */}
+                    </MenuItem>
                     {
                         makeMenuItems()
                     }
