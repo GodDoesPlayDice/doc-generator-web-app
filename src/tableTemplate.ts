@@ -1,12 +1,19 @@
 const basicNoticeFiels = [
     {
+        title: 'Дата составления текущего документа',
+        field: 'thisDocDate',
+    },
+    {
         title: 'ФИО клиента',
         field: 'clientName',
-        /* cellStyle: {width: 200} */
     },
     {
         title: 'Адрес регистрации клинета',
         field: 'clientAddress'
+    },
+    {
+        title: 'Дата заключения договора',
+        field: 'docDate'
     },
     {
         title: 'Номер договора',
@@ -31,11 +38,11 @@ const basicNoticeFiels = [
 ];
 const noticeWithDebtOrPaymentFields = [
     {
-        title: 'Сумма возврата числом',
+        title: 'Сумма возврата/доплаты числом',
         field: 'paymentByNumber'
     },
     {
-        title: 'Сумма возврата текстом',
+        title: 'Сумма возврата/доплаты текстом',
         field: 'paymentByText'
     },
     {

@@ -35,15 +35,42 @@ function loadMainPage() {
     return render("index", {});
 };
 
+function findTemplateID(options) {
+    let docType = options["select-doc-type"];
+    let docSubType = options["select-doc-subtype"];
+    let devObject = options["select-development-project"];
+    return (googleDocTemlatesID[docType][docSubType][devObject]);
+};
+
+
+function generateDocs(selectedOptions, tableData) {
+    let options = JSON.parse(selectedOptions);
+    let data = JSON.parse(tableData);
+
+    let templateID = findTemplateID(options);
+    // проход по строкам таблицы
+    data.forEach((elem, index) => {
+        // создаем копию шаблона
+        const template = DriveApp.getFileById(templateID);
+        const templateName = template.getName();
+        const newDocID = template.makeCopy().setName(elem.clientName + " " + templateName + new Date()).getId();
+        const newDocFile = DocumentApp.openById(newDocID);
+        const body = newDocFile.getBody();
+        // выполняем замену текста для каждого поля
+        for (let key in elem) {
+            body.replaceText("{"+key+"}", elem[key]);
+        }
+    })
+}
 
 
 function replace() {
-  let template = DriveApp.getFileById('17ArfFaQXLllDjEfsz_TLgPRQVkMPKpIm4YMGauAQ4V4');
-  let templateName = template.getName();
-  let newDocID = template.makeCopy().setName(templateName + ' copy').getId();
-  let newDocFile = DocumentApp.openById(newDocID);
-  
-  var body = newDocFile.getBody();
-  body.replaceText('{clientName}', "Apps Script");
+    let template = DriveApp.getFileById('17ArfFaQXLllDjEfsz_TLgPRQVkMPKpIm4YMGauAQ4V4');
+    let templateName = template.getName();
+    let newDocID = template.makeCopy().setName(templateName + ' copy').getId();
+    let newDocFile = DocumentApp.openById(newDocID);
+
+    var body = newDocFile.getBody();
+    body.replaceText('{clientName}', "Apps Script");
 }
 

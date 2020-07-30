@@ -50,6 +50,8 @@ interface backdropOptions {
 interface modalOptions {
   isOpen: boolean;
   message?: string;
+  confirmBtn?: () => void;
+  cancelBtn?: () => void;
 }
 
 export default function App() {
@@ -128,6 +130,16 @@ export default function App() {
 
   function generateDocsConfirmed() {
     console.log(options, tableRowsData);
+    const optionsForServer = JSON.stringify(options);
+    const dataForServer = JSON.stringify(tableRowsData);
+    
+
+    // приходится делать такое дерьмо, потому что компилятор не пропускает выкрутасы с гуглом
+    eval("google.script.run.withSuccessHandler(onSuccess).generateDocs(optionsForServer, dataForServer)")
+    function onSuccess() {
+      console.log("удачненько");
+      updateBackdropOptions({ isOpen: false });
+    }
   }
 
   // определение состава опций селекта выбора подтипа документов
@@ -209,7 +221,21 @@ export default function App() {
         <SimpleButton
           label="Создать документы"
           onClick={function () {
-            updateModalOptions({ isOpen: true });
+            updateModalOptions({
+              isOpen: true,
+              confirmBtn: function () {
+                // закрывает модальное окно
+                updateModalOptions({ isOpen: false })
+                // открывает backdrop
+                updateBackdropOptions({ isOpen: true })
+                // запускает генерацию документов
+                generateDocsConfirmed();
+              },
+              cancelBtn: function () {
+                updateModalOptions({ isOpen: false })
+              },
+            });
+
           }}
           startIcon={<SaveIcon />}
         />
@@ -231,20 +257,11 @@ export default function App() {
           </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={function () {
-                updateModalOptions({ isOpen: false })
-              }} color="primary">
+              <Button onClick={modalOptions.cancelBtn} color="primary">
                 Отмена
           </Button>
-              <Button onClick={function () {
-                // закрывает модальное окно
-                updateModalOptions({ isOpen: false })
-                // открывает backdrop
-                updateBackdropOptions({ isOpen: true })
-                // запускает генерацию документов
-                generateDocsConfirmed();
-              }} color="primary" autoFocus>
-                Погнали
+              <Button onClick={modalOptions.confirmBtn} color="primary" autoFocus>
+                Подтвердить
           </Button>
             </DialogActions>
           </>
@@ -255,14 +272,14 @@ export default function App() {
         isOpen={backdropOptions.isOpen}
         children={
           <div>
-          <SimpleButton
-            startIcon={<CircularProgress color="inherit" />}
-            label="АТМЕНА!!!"
-            onClick={function () {
-              console.log(backdropOptions)
-              updateBackdropOptions({ isOpen: false })
-            }}
-          />
+            <SimpleButton
+              startIcon={<CircularProgress color="inherit" />}
+              label="АТМЕНА!!!"
+              onClick={function () {
+                console.log(backdropOptions)
+                updateBackdropOptions({ isOpen: false })
+              }}
+            />
           </div>
         }
       />
