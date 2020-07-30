@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactChild } from 'react';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import SaveIcon from '@material-ui/icons/Save';
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ButtonProps {
     label: string;
     onClick: () => void;
+    startIcon?: ReactChild;
 }
 
 export default function SimpleButton(props: ButtonProps) {
@@ -22,11 +23,11 @@ export default function SimpleButton(props: ButtonProps) {
     return (
       <div>
         <Button
+          startIcon={props.startIcon}
           variant="contained"
           color="primary"
           size="large"
           className={classes.button}
-          startIcon={<SaveIcon />}
           onClick={props.onClick}
         >
           {props.label}

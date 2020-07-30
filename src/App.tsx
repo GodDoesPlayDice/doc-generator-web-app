@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import Table from './components/table'
 import Button from '@material-ui/core/Button';
 
+// мой словарь для опций селектов
+import Dictionary from './dictionary';
+
 // мои компоненты
 import SimpleSelect from './components/select'
 import SimpleButton from './components/button';
@@ -13,6 +16,12 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+
+// для backdrop
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// для кнопки сохранения
+import SaveIcon from '@material-ui/icons/Save';
 
 // мои шаблоны для полей таблицы
 import {
@@ -43,12 +52,6 @@ interface modalOptions {
   message?: string;
 }
 
-function generateDocuments(selectedOptions: selectedOptionsObj, tableRowsData: any) {
-  // showModal(message)
-  // run google scripts
-  // onSuccess run func which shows modal with result 
-}
-
 export default function App() {
 
   // выбранные в селектах опции
@@ -66,7 +69,28 @@ export default function App() {
     isOpen: false
   });
 
-  // используем эффект для изменения полей таблицы
+
+  // обновляем тут стейт для селектами опций
+  function onSelectChange(value: string, selectID: string) {
+    // при изменении любого селекта должны удаляться все данные таблицы
+    updateTableRowsData(false);
+    //записываем в глобальный state выбранные опции в селектах
+    updateOptions((prevState: any) => {
+      // проверка, меняли ли мы первое поле - тип документа 
+      if (selectID === "select-doc-type") {
+        return (
+          { "select-doc-type": value }
+        );
+      } else { // если изменено не первое поле
+        prevState[selectID] = value;
+        return { ...prevState };
+      }
+
+    });
+
+  }
+
+  // используем эффект для перерисовки полей таблицы
   useEffect(() => {
     let finalTemplate: any = [];
     // поля для уведомления
@@ -96,25 +120,13 @@ export default function App() {
 
   }, [options]);
 
-  // обновляем тут данные, записанные в таблицу
+  // записываем данные, записанные в таблицу
   function onTableChange(data: any) {
     updateTableRowsData(data);
   }
 
-  // обновляем тут стейт для селектами опций
-  function onSelectChange(value: string, id: string) {
-    // при изменении любого селекта должны удаляться все данные таблицы
-    updateTableRowsData(false);
-    //записываем в глобальный state выбранные опции в селектах
-    updateOptions((prevState: any) => {
-      prevState[id] = value;
-      return { ...prevState };
-    });
 
-  }
-
-
-  function generateBtnClicked() {
+  function generateDocsConfirmed() {
     console.log(options, tableRowsData);
   }
 
@@ -138,10 +150,9 @@ export default function App() {
 
   // функция, которая собирает строку заголовка таблицы
   const createTableTitle = () => {
-    if (options == {}) return "Таблица документов";
     let result: string = "";
     for (let key in options) {
-      result = result + " " + (options[key] as string);
+      result += " | " + (Dictionary[options[key]] as string);
     }
     return result;
   }
@@ -186,7 +197,6 @@ export default function App() {
 
         />
       }
-
       {options['select-development-project'] &&
         <Table
           tableTitle={createTableTitle()}
@@ -199,33 +209,25 @@ export default function App() {
         <SimpleButton
           label="Создать документы"
           onClick={function () {
-            updateBackdropOptions({ isOpen: true });
-            generateBtnClicked()
+            updateModalOptions({ isOpen: true });
           }}
+          startIcon={<SaveIcon />}
         />
       }
       {/* <Button variant="outlined" color="primary" onClick={function () {
-        updateBackdropOptions({ isOpen: true })
+        updateModalOptions({ isOpen: true })
       }}>
         Show backdrop
       </Button> */}
-      <Button variant="outlined" color="primary" onClick={
-        function () {
-          updateModalOptions({ isOpen: true })
-        }}>
-        Open alert dialog
-      </Button>
-
       {/* модальное окно */}
       <AlertDialog
         isOpen={modalOptions.isOpen}
         children={
           <>
-            <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+            <DialogTitle id="alert-dialog-title">{"Подтвердите действие"}</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Let Google help apps determine location. This means sending anonymous location data to
-                Google, even when no apps are running.
+                Сгенерировать документы по данным из таблицы?
           </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -239,8 +241,10 @@ export default function App() {
                 updateModalOptions({ isOpen: false })
                 // открывает backdrop
                 updateBackdropOptions({ isOpen: true })
+                // запускает генерацию документов
+                generateDocsConfirmed();
               }} color="primary" autoFocus>
-                Сохранить документы
+                Погнали
           </Button>
             </DialogActions>
           </>
@@ -250,13 +254,16 @@ export default function App() {
       <SimpleBackdrop
         isOpen={backdropOptions.isOpen}
         children={
+          <div>
           <SimpleButton
+            startIcon={<CircularProgress color="inherit" />}
             label="АТМЕНА!!!"
             onClick={function () {
               console.log(backdropOptions)
               updateBackdropOptions({ isOpen: false })
             }}
           />
+          </div>
         }
       />
     </>

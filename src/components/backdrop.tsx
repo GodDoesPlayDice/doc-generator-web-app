@@ -32,7 +32,6 @@ export default function SimpleBackdrop(props: BackdropProps) {
         <div>
             <Backdrop className={classes.backdrop} open={props.isOpen} /* onClick={handleClose} */>
                 {props.children}
-                <CircularProgress color="inherit" />
             </Backdrop>
         </div>
     );
