@@ -1,4 +1,4 @@
-var googleDocTemlatesID = {
+const googleDocTemlatesID = {
     notice: {
         'simpleNotice': {
             V2: '1ZS8OFPRgJj0NdH3Vf57TdzWY4kNYYbkLPR0ZXI0Rv5I',
@@ -30,3 +30,16 @@ var googleDocTemlatesID = {
     },
 
 };
+
+const Dictionary =  {
+    'simpleNotice': "Уведомление общее",
+    'noticeWithDebt': "Уведомление с доплатой",
+    'noticeWithPayment': "Уведомление с возвратом",
+    'withDebt': "С долгом",
+    'withoutDebt': "Без долга",
+    'act': "Акт приема-передачи",
+    'notice': "Уведомление",
+    'V2': "Виноград 2",
+    'O2': "Оазис 2",
+    'B': "Баланс",
+}

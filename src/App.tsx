@@ -20,6 +20,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 // для backdrop
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+//верхнее меню
+import NavBar from './components/navbar';
+
 // для кнопки сохранения
 import SaveIcon from '@material-ui/icons/Save';
 
@@ -30,7 +33,8 @@ import {
   basicActFields,
   basicV2O2Fields,
   basicBFields,
-  actWithDebtFields
+  actWithDebtFields,
+  basicBV2Fields
 } from './tableTemplate';
 
 // описываем имена опции для селектов и тип хранимых значений
@@ -52,6 +56,8 @@ interface modalOptions {
   message?: string;
   confirmBtn?: () => void;
   cancelBtn?: () => void;
+  titleText?: string;
+  content?: any;
 }
 
 export default function App() {
@@ -108,12 +114,14 @@ export default function App() {
       finalTemplate = finalTemplate.concat(basicActFields)
       // выбор полей для объекта 
       if (options["select-development-project"] === 'B') {
+        finalTemplate = finalTemplate.concat(basicBV2Fields)
         finalTemplate = finalTemplate.concat(basicBFields)
       } else {
         finalTemplate = finalTemplate.concat(basicV2O2Fields)
       }
       // выбор полей для подтипа документа
       if (options["select-doc-subtype"] === 'withDebt') {
+        finalTemplate = finalTemplate.concat(basicBV2Fields)
         finalTemplate = finalTemplate.concat(actWithDebtFields)
       }
     };
@@ -127,19 +135,35 @@ export default function App() {
     updateTableRowsData(data);
   }
 
-
+  // отправка данных на сервер для генерации документов
   function generateDocsConfirmed() {
-    console.log(options, tableRowsData);
     const optionsForServer = JSON.stringify(options);
     const dataForServer = JSON.stringify(tableRowsData);
-    
 
-    // приходится делать такое дерьмо, потому что компилятор не пропускает выкрутасы с гуглом
+
+    // приходится делать такое гуано, потому что компилятор не пропускает выкрутасы с гуглом
     eval("google.script.run.withSuccessHandler(onSuccess).generateDocs(optionsForServer, dataForServer)")
-    function onSuccess() {
-      console.log("удачненько");
+    function onSuccess(folderURL: string) {
+      updateModalOptions({
+        isOpen: true,
+        titleText: "Документы успешно созданы",
+        content: <><a href={folderURL} target="_blank">Папка с документами</a><p>Очистить таблицу?</p></>,
+        confirmBtn: function () {
+          // удаление введенных в таблицу данных 
+          updateTableRowsData(false);
+          // закрывает модальное окно
+          updateModalOptions({
+            isOpen: false,
+          })
+        },
+        cancelBtn: function () {
+          updateModalOptions({ isOpen: false })
+        },
+      });
+      // закрываем backdrop
       updateBackdropOptions({ isOpen: false });
     }
+
   }
 
   // определение состава опций селекта выбора подтипа документов
@@ -147,9 +171,9 @@ export default function App() {
     if (options["select-doc-type"] === 'notice') {
       return (
         {
-          "Уведомление общее": 'simpleNotice',
-          "Уведомление с доплатой": 'noticeWithDebt',
-          "Уведомление с возвратом": 'noticeWithPayment',
+          "Общее": 'simpleNotice',
+          "С доплатой": 'noticeWithDebt',
+          "С возвратом": 'noticeWithPayment',
         }
       );
     } else if (options["select-doc-type"] === 'act') {
@@ -172,6 +196,7 @@ export default function App() {
 
   return (
     <>
+      <NavBar />
       <SimpleSelect
         labelText="Вид документа"
         liftStateUpFunc={onSelectChange}
@@ -218,14 +243,19 @@ export default function App() {
         />
       }
       {options['select-development-project'] &&
+        tableRowsData.length > 0 &&
         <SimpleButton
           label="Создать документы"
           onClick={function () {
             updateModalOptions({
               isOpen: true,
+              titleText: "Подтверждение",
+              content: "Сгенерировать документы по данным в таблице?",
               confirmBtn: function () {
                 // закрывает модальное окно
-                updateModalOptions({ isOpen: false })
+                updateModalOptions({
+                  isOpen: false,
+                })
                 // открывает backdrop
                 updateBackdropOptions({ isOpen: true })
                 // запускает генерацию документов
@@ -240,21 +270,15 @@ export default function App() {
           startIcon={<SaveIcon />}
         />
       }
-      {/* <Button variant="outlined" color="primary" onClick={function () {
-        updateModalOptions({ isOpen: true })
-      }}>
-        Show backdrop
-      </Button> */}
-      {/* модальное окно */}
       <AlertDialog
         isOpen={modalOptions.isOpen}
         children={
           <>
-            <DialogTitle id="alert-dialog-title">{"Подтвердите действие"}</DialogTitle>
+            <DialogTitle id="alert-dialog-title">{modalOptions.titleText}</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Сгенерировать документы по данным из таблицы?
-          </DialogContentText>
+                {modalOptions.content}
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button onClick={modalOptions.cancelBtn} color="primary">
@@ -270,18 +294,7 @@ export default function App() {
       {/* крутилочка */}
       <SimpleBackdrop
         isOpen={backdropOptions.isOpen}
-        children={
-          <div>
-            <SimpleButton
-              startIcon={<CircularProgress color="inherit" />}
-              label="АТМЕНА!!!"
-              onClick={function () {
-                console.log(backdropOptions)
-                updateBackdropOptions({ isOpen: false })
-              }}
-            />
-          </div>
-        }
+        children={<CircularProgress color="inherit" />}
       />
     </>
 

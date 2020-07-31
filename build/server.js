@@ -42,35 +42,51 @@ function findTemplateID(options) {
     return (googleDocTemlatesID[docType][docSubType][devObject]);
 };
 
+function createFolderForNewDocs(folderName) {
+    const folders = DriveApp.getFolders();
+    // проверяем, есть ли у нас в корневой директории родительская папка
+    let finalFolder;
+    folderName = `${folderName} (от ${("0" + new Date().getDate()).slice(-2)}.${("0" + (new Date().getMonth() + 1)).slice(-2)}.${new Date().getFullYear()})`;
+    while (folders.hasNext()) {
+        const parentFolder = folders.next();
+        if (parentFolder.getName() === 'Генератор документов') {
+            finalFolder = parentFolder.createFolder(folderName);
+            return finalFolder;
+        }
+    };
+    const newParentFolder = DriveApp.createFolder("Генератор документов");
+    finalFolder = newParentFolder.createFolder(folderName);
+    return finalFolder;
+}
+
 
 function generateDocs(selectedOptions, tableData) {
-    let options = JSON.parse(selectedOptions);
-    let data = JSON.parse(tableData);
+    const options = JSON.parse(selectedOptions);
+    const data = JSON.parse(tableData);
 
-    let templateID = findTemplateID(options);
+    let folderName = "";
+    for (let key in options) {
+        folderName += Dictionary[options[key]] + " "
+    }
+
+
+
+    const templateID = findTemplateID(options);
+    const folderForDocs = createFolderForNewDocs(folderName)
+    const folderURL = folderForDocs.getUrl();
     // проход по строкам таблицы
     data.forEach((elem, index) => {
         // создаем копию шаблона
         const template = DriveApp.getFileById(templateID);
         const templateName = template.getName();
-        const newDocID = template.makeCopy().setName(elem.clientName + " " + templateName + new Date()).getId();
+        const newDocID = template.makeCopy(folderForDocs).setName(`${elem.clientName} (${templateName})`).getId();
         const newDocFile = DocumentApp.openById(newDocID);
         const body = newDocFile.getBody();
         // выполняем замену текста для каждого поля
         for (let key in elem) {
-            body.replaceText("{"+key+"}", elem[key]);
+            body.replaceText("{" + key + "}", elem[key]);
         }
     })
-}
-
-
-function replace() {
-    let template = DriveApp.getFileById('17ArfFaQXLllDjEfsz_TLgPRQVkMPKpIm4YMGauAQ4V4');
-    let templateName = template.getName();
-    let newDocID = template.makeCopy().setName(templateName + ' copy').getId();
-    let newDocFile = DocumentApp.openById(newDocID);
-
-    var body = newDocFile.getBody();
-    body.replaceText('{clientName}', "Apps Script");
+    return folderURL;
 }
 

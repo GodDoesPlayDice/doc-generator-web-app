@@ -133,19 +133,25 @@ const basicActFields: any = [
 const basicV2O2Fields = [
     {
         title: 'Площадь (без лет. пом.) по договору',
-        field: 'flatAreaUnderContract', type: 'numeric'
+        field: 'flatAreaUnderContract', /* type: 'numeric' */
     },
     {
         title: 'Площадь (без лет. пом.) по инвентаризации',
-        field: 'flatAreaUnderInventory', type: 'numeric'
+        field: 'flatAreaUnderInventory', /* type: 'numeric' */
     },
     {
         title: 'Площадь (с пониж. коэфф.) по договору',
-        field: 'flatAreaWithBalconiesUnderContract', type: 'numeric'
+        field: 'flatAreaWithBalconiesUnderContract', /* type: 'numeric' */
     },
     {
         title: 'Площадь (с пониж. коэфф.) по инвентаризации',
-        field: 'flatAreaWithBalconiesUnderInventory', type: 'numeric'
+        field: 'flatAreaWithBalconiesUnderInventory', /* type: 'numeric' */
+    },
+];
+const basicBV2Fields = [
+    {
+        title: 'Номер подъезда',
+        field: 'entranceNumber', type: 'numeric'
     },
 ];
 const basicBFields = [
@@ -179,5 +185,6 @@ export {
     basicActFields,
     basicV2O2Fields,
     basicBFields,
-    actWithDebtFields
+    actWithDebtFields,
+    basicBV2Fields
 };

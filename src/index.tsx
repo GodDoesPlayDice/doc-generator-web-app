@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+window.onbeforeunload = function() {
+  return "Вы уверены, что хотите покинуть страницу? Введенные данные будут удалены.";
+};
+
 ReactDOM.render(
   <React.StrictMode>
     <App />

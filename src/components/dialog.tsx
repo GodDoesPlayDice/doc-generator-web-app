@@ -1,15 +1,19 @@
 import React, { ReactChild } from 'react';
-import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
+
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
 
 interface DialogProps {
-    isOpen: boolean;
-    children?: ReactChild;
+  isOpen: boolean;
+  children?: ReactChild;
 }
 
 
 export default function AlertDialog(props: DialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   /* const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -23,12 +27,14 @@ export default function AlertDialog(props: DialogProps) {
   return (
     <div>
       <Dialog
+        fullScreen={fullScreen}
         open={props.isOpen}
         /* onClose={handleClose} */
-        aria-labelledby="alert-dialog-title"
+        /* aria-labelledby="alert-dialog-title" */
+        aria-labelledby="responsive-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-          {props.children}
+        {props.children}
       </Dialog>
     </div>
   );

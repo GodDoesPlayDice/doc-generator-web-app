@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import MaterialTable, { Column } from 'material-table';
+import MaterialTable, { Column, MTableHeader } from 'material-table';
 
 import { forwardRef } from 'react';
 
@@ -18,7 +18,9 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
-import { Interface } from 'readline';
+
+import Button from '@material-ui/core/Button';
+import { withStyles, withWidth } from '@material-ui/core';
 
 const tableIcons: any = {
 	Add: forwardRef((props: any, ref: any) => <AddBox {...props} ref={ref} />),
@@ -123,6 +125,12 @@ export default function Table(props: TableProps) {
 	return (
 		<MaterialTable
 			icons={tableIcons}
+			/* column={{
+				cellStyle: {
+					backgroundColor: '#01579b',
+					color: '#FFF'
+				}
+			}} */
 			title={props.tableTitle}
 			columns={props.columns}
 			data={props.currentData}
@@ -142,8 +150,9 @@ export default function Table(props: TableProps) {
 					deleteTooltip: 'Удалить документ',
 					editTooltip: 'Редактировать документ',
 					editRow: {
-						cancelTooltip: 'Отменить',
-						saveTooltip: 'Сохранить'
+						cancelTooltip: 'Отмена',
+						saveTooltip: 'Подтвердить',
+						deleteText: 'Вы уверены, что хотите удалить строку?',
 					}
 				},
 				toolbar: {
