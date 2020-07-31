@@ -7,10 +7,14 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     button: {
       margin: theme.spacing(1),
+      width: '40%',
+      marginLeft: '30%',
+      height: 450,
+      background: 'center url("https://icdn.lenta.ru/images/2017/04/12/20/20170412202539377/detail_3e5466c192ac4ec7863d26c94420095a.jpg")'
     },
   }),
 );
-
+/* https://icdn.lenta.ru/images/2017/04/12/20/20170412202539377/detail_3e5466c192ac4ec7863d26c94420095a.jpg */
 interface ButtonProps {
     label: string;
     onClick: () => void;
@@ -23,14 +27,14 @@ export default function SimpleButton(props: ButtonProps) {
     return (
       <div>
         <Button
-          startIcon={props.startIcon}
+          /* startIcon={props.startIcon} */
           variant="contained"
           color="primary"
           size="large"
           className={classes.button}
           onClick={props.onClick}
         >
-          {props.label}
+          {/* {props.label} */}
         </Button>
       </div>
     );

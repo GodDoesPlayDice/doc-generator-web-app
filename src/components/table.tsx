@@ -19,8 +19,12 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
+import TableContainer from '@material-ui/core/TableContainer';
+
 import Button from '@material-ui/core/Button';
 import { withStyles, withWidth } from '@material-ui/core';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import classes from '*.module.css';
 
 const tableIcons: any = {
 	Add: forwardRef((props: any, ref: any) => <AddBox {...props} ref={ref} />),
@@ -43,6 +47,19 @@ const tableIcons: any = {
 };
 
 
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+			padding: '2%',
+			maxWidth: '96%',
+			
+		},
+		table: {
+			border: '1px solid #cecece',
+			borderRadius: 4,
+		}
+    }),
+);
 
 
 interface TableProps {
@@ -54,6 +71,7 @@ interface TableProps {
 }
 
 export default function Table(props: TableProps) {
+	const classes = useStyles();
 
 	// интерфейс у нас будет динамическим, так что пока это уберем
 	/* interface Row {
@@ -123,6 +141,10 @@ export default function Table(props: TableProps) {
 	};
 
 	return (
+		<TableContainer
+			className={classes.root}
+		>
+		<div className={classes.table}>
 		<MaterialTable
 			icons={tableIcons}
 			options={{
@@ -173,5 +195,7 @@ export default function Table(props: TableProps) {
 				}
 			}}
 		/>
+		</div>
+		</TableContainer>
 	);
 }

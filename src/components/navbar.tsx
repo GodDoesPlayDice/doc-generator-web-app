@@ -9,9 +9,13 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
+        root: {
+            marginBottom: 40,
+        },
         toolbar: {
             display: "flex",
-            justifyContent: "center"
+            justifyContent: "left",
+            paddingLeft: '2%',
         },
     }),
 );
@@ -20,7 +24,7 @@ export default function NavBar() {
     const classes = useStyles();
 
     return (
-        <div>
+        <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h6" >

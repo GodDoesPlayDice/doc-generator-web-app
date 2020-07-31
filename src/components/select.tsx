@@ -10,7 +10,8 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         formControl: {
             margin: theme.spacing(1),
-            minWidth: 300,
+            minWidth: '96%',
+            marginLeft: '2%',
         },
         selectEmpty: {
             marginTop: theme.spacing(2),
@@ -53,10 +54,11 @@ export default function SimpleSelect(props: SelectProps) {
 
     return (
         <div>
-            <FormControl className={classes.formControl}>
+            <FormControl variant='outlined' className={classes.formControl}>
                 <InputLabel id={props.labelID}>{props.labelText}</InputLabel>
                 <Select
                     labelId={props.labelID}
+                    label={props.labelText}
                     id={props.selectID}
                     value={value}
                     onChange={handleChange}
