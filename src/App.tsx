@@ -100,7 +100,13 @@ export default function App() {
 
   // используем эффект для перерисовки полей таблицы
   useEffect(() => {
-    let finalTemplate: any = [];
+    let finalTemplate: any = [
+      /* {
+        width: 400,
+        title: "Details",
+        field: "url",
+      } */
+    ];
     // поля для уведомления
     if (options["select-doc-type"] === 'notice') {
       finalTemplate = finalTemplate.concat(basicNoticeFiels);

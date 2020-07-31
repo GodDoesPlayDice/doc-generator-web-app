@@ -125,12 +125,15 @@ export default function Table(props: TableProps) {
 	return (
 		<MaterialTable
 			icons={tableIcons}
-			/* column={{
-				cellStyle: {
-					backgroundColor: '#01579b',
-					color: '#FFF'
-				}
-			}} */
+			options={{
+				/* fixedColumns: {
+					left: 1,
+				}, */
+				headerStyle: {
+					width: 250,
+					minWidth: 250
+				},
+			}}
 			title={props.tableTitle}
 			columns={props.columns}
 			data={props.currentData}
