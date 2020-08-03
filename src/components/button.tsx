@@ -22,7 +22,7 @@ export default function SimpleButton(props: ButtonProps) {
         margin: theme.spacing(1),
         width: '30%',
         marginLeft: '35%',
-        height: 400,
+        height: 200,
         background: 'center no-repeat url(' + url + ')',
         backgroundSize: '100%',
       },
@@ -40,11 +40,14 @@ export default function SimpleButton(props: ButtonProps) {
         size="large"
         className={classes.button}
         onClick={() => {
-          props.onClick();
           setUrl(pressedUrl);
           setTimeout(() => {
             setUrl(defaultUrl);
-          }, 1500)
+          }, 1500);
+          setTimeout(() => {
+            props.onClick();
+          },1100)
+          
         }}
       >
         {/* {props.label} */}

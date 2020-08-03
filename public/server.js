@@ -46,7 +46,21 @@ function createFolderForNewDocs(folderName) {
     const folders = DriveApp.getFolders();
     // проверяем, есть ли у нас в корневой директории родительская папка
     let finalFolder;
-    folderName = `${folderName} (от ${("0" + new Date().getDate()).slice(-2)}.${("0" + (new Date().getMonth() + 1)).slice(-2)}.${new Date().getFullYear()})`;
+    let date = new Date();
+    let options = {
+        /* era: 'long', */
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+        timezone: 'UTC',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+    };
+    /* folderName = `${folderName} (от ${("0" + new Date().getDate()).slice(-2)}.${("0" + (new Date().getMonth() + 1)).slice(-2)}.${new Date().getFullYear()}) ${new Date().getMinutes()}:${new Date().getSeconds()}:${new Date().getMilliseconds()}`; */
+    folderName = `${folderName} от (${date.toLocaleString('ru', options)})`
+
     while (folders.hasNext()) {
         const parentFolder = folders.next();
         if (parentFolder.getName() === 'Генератор документов') {
